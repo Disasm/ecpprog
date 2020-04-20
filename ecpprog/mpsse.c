@@ -230,7 +230,7 @@ void mpsse_init(int ifnum, const char *devstr, bool slow_clock)
 
 	mpsse_send_byte(MC_SETB_LOW);
 	mpsse_send_byte(0x08); /* Value */
-	mpsse_send_byte(0x0B); /* Direction */
+	mpsse_send_byte(0x1B); /* Direction. 0x10 is needed to activate JTAG buffer on BusBlaster v3 */
 }
 
 void mpsse_close(void)
