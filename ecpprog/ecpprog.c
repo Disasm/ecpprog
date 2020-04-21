@@ -206,42 +206,22 @@ static uint8_t read_status_1(){
 
 	if (verbose) {
 		fprintf(stderr, "SR1: 0x%02X\n", data[1]);
-		fprintf(stderr, " - SPRL: %s\n",
-			((data[1] & (1 << 7)) == 0) ? 
-				"unlocked" : 
-				"locked");
-		fprintf(stderr, " -  SPM: %s\n",
+		fprintf(stderr, " - SPR0: %d\n", (data[1] & (1 << 7)) != 0);
+		fprintf(stderr, " -  SEC: %s\n",
 			((data[1] & (1 << 6)) == 0) ?
-				"Byte/Page Prog Mode" :
-				"Sequential Prog Mode");
-		fprintf(stderr, " -  EPE: %s\n",
+				"64KB blocks" :
+				"4KB sectors");
+		fprintf(stderr, " -   TB: %s\n",
 			((data[1] & (1 << 5)) == 0) ?
-				"Erase/Prog success" :
-				"Erase/Prog error");
-		fprintf(stderr, "-  SPM: %s\n",
-			((data[1] & (1 << 4)) == 0) ?
-				"~WP asserted" :
-				"~WP deasserted");
-		fprintf(stderr, " -  SWP: ");
-		switch((data[1] >> 2) & 0x3) {
-			case 0:
-				fprintf(stderr, "All sectors unprotected\n");
-				break;
-			case 1:
-				fprintf(stderr, "Some sectors protected\n");
-				break;
-			case 2:
-				fprintf(stderr, "Reserved (xxxx 10xx)\n");
-				break;
-			case 3:
-				fprintf(stderr, "All sectors protected\n");
-				break;
-		}
+				"top" :
+				"bottom");
+		uint8_t bp = (data[1] >> 2) & 7;
+		fprintf(stderr, " -  BPx: %03x\n", (bp | (bp << 3) | (bp << 6)) & 0x111); // Dunno, it doesn't like %03b
 		fprintf(stderr, " -  WEL: %s\n",
 			((data[1] & (1 << 1)) == 0) ?
 				"Not write enabled" :
 				"Write enabled");
-		fprintf(stderr, " - ~RDY: %s\n",
+		fprintf(stderr, " - BUSY: %s\n",
 			((data[1] & (1 << 0)) == 0) ?
 				"Ready" :
 				"Busy");
@@ -258,9 +238,10 @@ static uint8_t read_status_2(){
 	if (verbose) {
 		fprintf(stderr, "SR2: 0x%02X\n", data[1]);
 		fprintf(stderr, " - QE: %s\n",
-			((data[1] & (1 << 2)) == 0) ? 
-				"enabled" : 
-				"disabled");
+			((data[1] & (1 << 1)) == 0) ?
+				"disabled" :
+				"enabled");
+		fprintf(stderr, " - SRP1: %d\n", (data[1] & 1) != 0);
 
 	}
 
