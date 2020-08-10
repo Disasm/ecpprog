@@ -609,6 +609,7 @@ static void help(const char *progname)
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Miscellaneous options:\n");
 	fprintf(stderr, "      --help            display this help and exit\n");
+	fprintf(stderr, "      --reload          reload bitstream after programming\n");
 	fprintf(stderr, "  --                    treat all remaining arguments as filenames\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Exit status:\n");
@@ -646,6 +647,7 @@ int main(int argc, char **argv)
 	bool slow_clock = false;
 	bool disable_protect = false;
 	bool disable_verify = false;
+	bool reload = false;
 	const char *filename = NULL;
 	const char *devstr = NULL;
 	int ifnum = 0;
@@ -657,6 +659,7 @@ int main(int argc, char **argv)
 
 	static struct option long_options[] = {
 		{"help", no_argument, NULL, -2},
+		{"reload", no_argument, NULL, -3},
 		{NULL, 0, NULL, 0}
 	};
 
@@ -768,6 +771,9 @@ int main(int argc, char **argv)
 		case -2:
 			help(argv[0]);
 			return EXIT_SUCCESS;
+		case -3: /* reload bitstream */
+			reload = true;
+			break;
 		default:
 			/* error message has already been printed */
 			fprintf(stderr, "Try `%s --help' for more information.\n", argv[0]);
@@ -1112,6 +1118,9 @@ int main(int argc, char **argv)
 
 	if (f != NULL && f != stdin && f != stdout)
 		fclose(f);
+
+	// Reload bitstream
+	if (reload) ecp_jtag_cmd(LSC_REFRESH);
 
 	// ---------------------------------------------------------
 	// Exit
